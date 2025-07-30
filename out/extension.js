@@ -71,11 +71,22 @@ function activate(context) {
     console.log('MDZ Extension: Attivata con successo!');
 }
 exports.activate = activate;
+class MdzDocument {
+    constructor(uri) {
+        this.uri = uri;
+    }
+    dispose() {
+        // Cleanup resources if needed
+    }
+}
 class MdzEditorProvider {
     constructor(context) {
         this.context = context;
     }
-    async resolveCustomTextEditor(document, webviewPanel, token) {
+    async openCustomDocument(uri, openContext, token) {
+        return new MdzDocument(uri);
+    }
+    async resolveCustomEditor(document, webviewPanel, token) {
         console.log('MDZ Editor: Risoluzione custom editor per', document.uri.fsPath);
         webviewPanel.webview.options = {
             enableScripts: true,
@@ -103,15 +114,7 @@ class MdzEditorProvider {
                     vscode.window.showErrorMessage(`Errore: ${error}`);
                 }
             });
-            // Aggiorna quando il documento cambia
-            const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
-                if (e.document.uri.toString() === document.uri.toString()) {
-                    console.log('MDZ Editor: Documento cambiato esternamente');
-                }
-            });
-            webviewPanel.onDidDispose(() => {
-                changeDocumentSubscription.dispose();
-            });
+            // Note: CustomReadonlyEditorProvider doesn't need document change listeners
         }
         catch (error) {
             console.error('Errore nella risoluzione del custom editor:', error);

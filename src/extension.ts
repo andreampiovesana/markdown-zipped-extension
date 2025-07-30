@@ -53,11 +53,27 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('MDZ Extension: Attivata con successo!');
 }
 
-class MdzEditorProvider implements vscode.CustomTextEditorProvider {
+class MdzDocument implements vscode.CustomDocument {
+    constructor(public readonly uri: vscode.Uri) {}
+    
+    dispose(): void {
+        // Cleanup resources if needed
+    }
+}
+
+class MdzEditorProvider implements vscode.CustomReadonlyEditorProvider {
     constructor(private context: vscode.ExtensionContext) {}
     
-    public async resolveCustomTextEditor(
-        document: vscode.TextDocument,
+    public async openCustomDocument(
+        uri: vscode.Uri,
+        openContext: vscode.CustomDocumentOpenContext,
+        token: vscode.CancellationToken
+    ): Promise<MdzDocument> {
+        return new MdzDocument(uri);
+    }
+    
+    public async resolveCustomEditor(
+        document: MdzDocument,
         webviewPanel: vscode.WebviewPanel,
         token: vscode.CancellationToken
     ): Promise<void> {
@@ -93,16 +109,7 @@ class MdzEditorProvider implements vscode.CustomTextEditorProvider {
                 }
             });
             
-            // Aggiorna quando il documento cambia
-            const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
-                if (e.document.uri.toString() === document.uri.toString()) {
-                    console.log('MDZ Editor: Documento cambiato esternamente');
-                }
-            });
-            
-            webviewPanel.onDidDispose(() => {
-                changeDocumentSubscription.dispose();
-            });
+            // Note: CustomReadonlyEditorProvider doesn't need document change listeners
             
         } catch (error) {
             console.error('Errore nella risoluzione del custom editor:', error);

@@ -2,8 +2,8 @@
   "name": "markdown-zipped",
   "displayName": "Markdown Zipped (MDZ)",
   "description": "Support for .mdz files (compressed markdown with media)",
-  "version": "1.0.0",
-  "publisher": "https://openindustry.it",
+  "version": "1.1.0",
+  "publisher": "openindustry.it",
   "author": {
     "name": "Andrea M. Piovesana",
     "email": "andrea.m.piovesana@openindustry.it"
